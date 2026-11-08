@@ -1,5 +1,9 @@
 package ru.ranepa.v17;
 
+import ru.ranepa.v17.domain.Course;
+import ru.ranepa.v17.domain.EnglishCourse;
+import ru.ranepa.v17.domain.GermanCourse;
+
 public class ReportPrinter {
 
     public void print(Course item) {
