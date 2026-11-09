@@ -1,48 +1,63 @@
 package ru.ranepa.v17;
 
+import ru.ranepa.v17.application.*;
 import ru.ranepa.v17.domain.Course;
 import ru.ranepa.v17.domain.Manager;
 import ru.ranepa.v17.domain.Teacher;
+import ru.ranepa.v17.infrastructure.CourseStore;
+import ru.ranepa.v17.infrastructure.CsvExporter;
+import ru.ranepa.v17.infrastructure.EmailService;
+import ru.ranepa.v17.infrastructure.PeopleStore;
 
 import java.util.Map;
 
 public class Main {
 
     public static void main(String[] args) {
-        LanguageSchool service = new LanguageSchool();
+        CourseRepository courseRepo = new CourseStore();
+        StaffRepository staffRepo = new PeopleStore();
+        Notifier notifier = new EmailService();
+        CourseExporter exporter = new CsvExporter();
+        CourseService courseService = new CourseService((CourseStore) courseRepo, notifier);
+        StaffService staffService = new StaffService(staffRepo);
+        LaunchService launchService = new LaunchService(courseRepo);
+        HandlingService handlingService = new HandlingService(courseRepo, staffRepo);
+        StatisticsService statisticsService = new StatisticsService(courseRepo);
+        ReportService reportService = new ReportService(courseRepo, staffRepo);
+        ExportService exportService = new ExportService(courseRepo, exporter);
+        NotificationService notificationService = new NotificationService(staffRepo, notifier);
+        courseService.addCourse("Английский", 12000, "english");
+        courseService.addCourse("Немецкий", 11000, "german");
+        courseService.addCourse("Французский", 11500, "french");
+        staffService.addWorker(new Teacher("Ксения", 40000));
+        staffService.addWorker(new Manager("Юрий", 60000));
 
-        service.addCourse("Английский", 12000, "english");
-        service.addCourse("Немецкий", 11000, "german");
-        service.addCourse("Французский", 11500, "french");
-        service.addWorker(new Teacher("Ксения", 40000));
-        service.addWorker(new Manager("Юрий", 60000));
+        reportService.printReport();
+        statisticsService.printStatistics();
 
-        service.printReport();
-        service.printStatistics();
+        courseService.cancelCourse("Английский");
+        launchService.startAll();
 
-        Database.COURSES.add(new CancelledEnglishCourse("Отменённый английский", 0));
         try {
-            service.startAll();
-        } catch (UnsupportedOperationException e) {
-            System.out.println("Сбой операции: " + e.getMessage());
-        }
-
-        try {
-            service.handleByWorker("Юрий");
-        } catch (UnsupportedOperationException e) {
+            handlingService.handleByWorker("Юрий");
+        } catch (IllegalArgumentException e) {
             System.out.println("Сбой роли: " + e.getMessage());
         }
 
-        service.addCourse("Английский", 12050, "english");
-        System.out.println("Объектов в списке: " + Database.COURSES.size());
-        System.out.println("Объектов в HashMap: " + Database.BY_NAME.size());
+        try{
+        courseService.addCourse("Английский", 12050, "english");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Курс не добавлен: " + e.getMessage());
+        }
+        System.out.println("Курсов в репозитории: " + courseRepo.findAll().size());
+        System.out.println("Сотрудников в репозитории: " + staffRepo.findAll().size());
 
-        System.out.println("Порядок обхода HashMap:");
-        for (Map.Entry<String, Course> entry : Database.BY_NAME.entrySet()) {
-            System.out.println(entry.getKey() + " -> " + entry.getValue().role());
+        System.out.println("Порядок обхода курсов:");
+        for (Course course : courseRepo.findAll()) {
+            System.out.println(course.getName() + " -> " + course.role());
         }
 
-        service.exportCsv();
-        service.notifyEveryone("Завтра родительское собрание");
+        exportService.exportAll();
+        notificationService.notifyAll("Завтра родительское собрание");
     }
 }

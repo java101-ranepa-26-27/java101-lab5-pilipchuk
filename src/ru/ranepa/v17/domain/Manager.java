@@ -16,16 +16,6 @@ public class Manager implements ShiftWorker {
     }
 
     @Override
-    public void handle(Course item) {
-        throw new UnsupportedOperationException("менеджер не обрабатывает объект: " + item.name);
-    }
-
-    @Override
-    public void clean() {
-        throw new UnsupportedOperationException("менеджер не убирает рабочее место");
-    }
-
-    @Override
     public void openShift() {
         System.out.println(name + " открывает смену");
     }

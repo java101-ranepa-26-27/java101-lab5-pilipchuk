@@ -1,6 +1,6 @@
 package ru.ranepa.v17.domain;
 
-public class Teacher implements ShiftWorker {
+public class Teacher implements ShiftWorker, CourseHandler, Cleaner {
 
     private final String name;
     private double salaryAmount;
