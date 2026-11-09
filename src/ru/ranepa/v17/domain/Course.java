@@ -25,9 +25,17 @@ public abstract class Course {
         }
         available = false;
     }
-
-
     public String role() {
         return "курс";
+    }
+    public String report(){
+        return name + "цена " + price;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+    public double getPrice(){
+        return price;
     }
 }

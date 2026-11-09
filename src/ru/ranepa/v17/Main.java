@@ -1,6 +1,5 @@
 package ru.ranepa.v17;
 
-import ru.ranepa.v17.application.LanguageSchool;
 import ru.ranepa.v17.domain.Course;
 import ru.ranepa.v17.domain.Manager;
 import ru.ranepa.v17.domain.Teacher;
